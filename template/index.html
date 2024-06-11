@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Store Inventory</title>
+        <style>
+            body {
+                display: flex;
+                background-image: url("{% static 'bg_standing_blur.png' %}");
+                backdrop-filter: blur(8px);
+                height: 100vh;
+                background-size: cover;
+                background-repeat: no-repeat;
+                margin: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-family: Arial, sans-serif;
+            }
+            .sidebar {
+                width: 200px;
+                height: 50vh;
+                padding: 20px;
+                box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+                align-content: center;
+            }
+            .sidebar input {
+                display: block;
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 10px;
+                border: none;
+                background-color: #4F7942;
+                color: white;
+                cursor: pointer;
+                font-size: 16px;
+            }
+            .sidebar input:hover {
+                background-color: #8B0000;
+            }
+            .main-content {
+                flex-grow: 1;
+                padding: 20px;
+                height: 90%;
+                width: 70%;
+                overflow-x: scroll;
+                overflow-y: auto;
+                float: right;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            table, th, td {
+                border: 1px solid #dddddd;
+            }
+            th, td {
+                padding: 10px;
+                text-align: left;
+            }
+            th {
+                background-color: #8B0000;
+                color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="sidebar">
+            <form method="post">
+                {% csrf_token %}
+                <input type="submit" value="Stock" name="Stock" id="Stock"></input>
+                {% csrf_token %}
+                <input type="submit" value="Inventory_In" name="Inventory_In" id="Inventory_In"></input>
+                {% csrf_token %}
+                <input type="submit" value="Inventory_Out" name="Inventory_Out" id="Inventory_Out"></input>
+                {% csrf_token %}
+                <input type="submit" value="Log_out" name="Log_out" id="Log_out"></input>
+            </form>
+        </div>
+        <div class="main-content">
+            {{ tab_data | safe }}
+        </div>
+    </body>
+</html>
