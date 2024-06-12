@@ -94,6 +94,7 @@ def stock(request):
 
 
 def handle_in(request):
+    global NAME
     if 'Home' in request.POST:
         return "OK"
     elif 'remove' in request.POST:
@@ -111,7 +112,8 @@ def handle_in(request):
         cur = conn.cursor()
         resp_1 = cur.execute(max_e_q).fetchall()
         ne = int(resp_1[0][0]) + 1
-        rd = dt.date.fromisoformat(str(request.POST.get('Receiving_date'))).strftime("%d/%m/%Y")
+        # rd = dt.date.fromisoformat(str(request.POST.get('Receiving_date'))).strftime("%d/%m/%Y")
+        rd = dt.date.today().strftime("%d/%m/%Y")
         code = str(request.POST.get('Code'))
         q_s = f"SELECT Item, Type, Available_stock FROM stock WHERE Code = {code};"
         item, type, av_stck = cur.execute(q_s).fetchall()[0]
@@ -119,7 +121,8 @@ def handle_in(request):
         ppt = float(request.POST.get('Price_per_type'))
         pn = str(request.POST.get('Purchaser_name'))
         bd = dt.date.fromisoformat(str(request.POST.get('Billing_date'))).strftime("%d/%m/%Y")
-        rb = str(request.POST.get('Received_by'))
+        # rb = str(request.POST.get('Received_by'))
+        rb = NAME
         rmk = str(request.POST.get('Remark'))
         new_st = int(av_stck) + qty
         ins_q = f"""
@@ -152,6 +155,7 @@ def inv_in(request):
 
 
 def handle_out(request):
+    global NAME
     if 'Home' in request.POST:
         return "OK"
     elif 'remove' in request.POST:
@@ -169,14 +173,16 @@ def handle_out(request):
         cur = conn.cursor()
         resp_1 = cur.execute(max_e_q).fetchall()
         ne = int(resp_1[0][0]) + 1
-        rd = dt.date.fromisoformat(str(request.POST.get('Date'))).strftime("%d/%m/%Y")
+        # rd = dt.date.fromisoformat(str(request.POST.get('Date'))).strftime("%d/%m/%Y")
+        rd = dt.date.today().strftime("%d/%m/%Y")
         nm = request.POST.get('Name')
         dep = request.POST.get('Department')
         code = str(request.POST.get('Code'))
         q_s = f"SELECT Item, Type, Available_stock FROM stock WHERE Code = {code};"
         item, type, av_stck = cur.execute(q_s).fetchall()[0]
         qty = int(request.POST.get('Quantity'))
-        dil_b = str(request.POST.get('Delivered_by'))
+        # dil_b = str(request.POST.get('Delivered_by'))
+        dil_b = NAME
         rmk = str(request.POST.get('Remark'))
         if qty <= av_stck:
             new_st = int(av_stck) - qty
