@@ -132,6 +132,9 @@ def handle_in(request):
         cur.execute(ins_q)
         up_q = f"UPDATE stock SET Available_stock = {new_st} WHERE Code = {code};"
         cur.execute(up_q)
+        if new_st >= 5:
+            up_q = f"UPDATE stock SET Need_to_order = '' WHERE Code = {code};"
+            cur.execute(up_q)
         conn.commit()
         conn.close()
         return f"entry {ne} have been added successfully!"
