@@ -122,7 +122,7 @@ def handle_in(request):
         pn = str(request.POST.get('Purchaser_name'))
         bd = dt.date.fromisoformat(str(request.POST.get('Billing_date'))).strftime("%d/%m/%Y")
         # rb = str(request.POST.get('Received_by'))
-        rb = NAME
+        rb = NAME.capitalize()
         rmk = str(request.POST.get('Remark'))
         new_st = int(av_stck) + qty
         ins_q = f"""
@@ -182,7 +182,7 @@ def handle_out(request):
         item, type, av_stck = cur.execute(q_s).fetchall()[0]
         qty = int(request.POST.get('Quantity'))
         # dil_b = str(request.POST.get('Delivered_by'))
-        dil_b = NAME
+        dil_b = NAME.capitalize()
         rmk = str(request.POST.get('Remark'))
         if qty <= av_stck:
             new_st = int(av_stck) - qty
@@ -192,6 +192,8 @@ def handle_out(request):
             """
             cur.execute(ins_q)
             up_q = f"UPDATE stock SET Available_stock = {new_st} WHERE Code = {code};"
+            cur.execute(up_q)
+            up_q = f"UPDATE stock SET Need_to_order = 'Need_to_order' WHERE Code = {code};"
             cur.execute(up_q)
             conn.commit()
             conn.close()
