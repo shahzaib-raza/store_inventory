@@ -67,6 +67,31 @@
         </style>
     </head>
     <body>
+
+        <script>
+            // Set a timeout of 60 seconds
+            let logoutTimer = setTimeout(triggerLogout, 60000);
+          
+            function resetTimer() {
+              clearTimeout(logoutTimer);
+              logoutTimer = setTimeout(triggerLogout, 60000);
+            }
+          
+            function triggerLogout() {
+              fetch('/logout/', { method: 'POST' })
+                .then(response => {
+                  if (response.ok) {
+                    window.location.href = '/login/';  // Redirect to login page after logout
+                  }
+                })
+                .catch(error => console.error('Logout failed:', error));
+            }
+          
+            // Reset the timer on any user activity
+            // document.addEventListener('mousemove', resetTimer);
+            document.addEventListener('keydown', resetTimer);
+        </script>
+        
         <div class="sidebar">
             <form method="post">
                 {% csrf_token %}
