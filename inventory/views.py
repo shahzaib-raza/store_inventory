@@ -1,10 +1,19 @@
 from django.shortcuts import render, redirect
+from django.views.decorators.csrf import csrf_exempt
 import pandas as pd
 import datetime as dt
 import sqlite3
 
 loggedin = False
 NAME = None
+
+@csrf_exempt
+def logout(request):
+    global loggedin
+    global NAME
+    loggedin = False
+    NAME = None
+    return redirect(to='/login/')
 
 def auth_login(user, pas):
     con = sqlite3.connect("store_inventory.sqlite")
