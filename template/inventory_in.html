@@ -68,25 +68,25 @@
 
         <script>
             // Set a timeout of 60 seconds
-            let logoutTimer = setTimeout(triggerLogout, 60000);
-          
+            let logoutTimer = setTimeout(triggerLogout, 120000);
+        
             function resetTimer() {
-              clearTimeout(logoutTimer);
-              logoutTimer = setTimeout(triggerLogout, 60000);
+            clearTimeout(logoutTimer);
+            logoutTimer = setTimeout(triggerLogout, 120000);
             }
-          
+        
             function triggerLogout() {
-              fetch('/logout/', { method: 'POST' })
+            fetch('/logout/', { method: 'POST' })
                 .then(response => {
-                  if (response.ok) {
+                if (response.ok) {
                     window.location.href = '/login/';  // Redirect to login page after logout
-                  }
+                }
                 })
                 .catch(error => console.error('Logout failed:', error));
             }
-          
+        
             // Reset the timer on any user activity
-            // document.addEventListener('mousemove', resetTimer);
+            document.addEventListener('mousemove', resetTimer);
             document.addEventListener('keydown', resetTimer);
         </script>
 
@@ -119,6 +119,9 @@
                             <input type="text" placeholder="Purchaser_name" name="Purchaser_name" id="Purchaser_name" required>
                             <br>
                             Billing_date: <input type="date" onload="getDate()" id="Billing_date" name="Billing_date">
+                            <br>
+                            <br>
+                            Expiry_date: <input type="date" onload="getDate()" id="Expiry_date" name="Expiry_date">
                             <br>
                             <!-- <input type="text" placeholder="Received_by" name="Received_by" id="Received_by" required> -->
                             <!-- <br> -->
