@@ -3,6 +3,9 @@ from django.views.decorators.csrf import csrf_exempt
 import pandas as pd
 import datetime as dt
 import sqlite3
+# import schedule
+from django.http import HttpResponse
+from io import BytesIO
 
 loggedin = False
 NAME = None
@@ -14,6 +17,10 @@ def logout(request):
     loggedin = False
     NAME = None
     return redirect(to='/login/')
+
+
+# schedule.every(1).minutes.do(logout)
+
 
 def auth_login(user, pas):
     con = sqlite3.connect("store_inventory.sqlite")
@@ -45,7 +52,7 @@ def get_table():
     conn = sqlite3.connect("store_inventory.sqlite")
     try:
         df = pd.read_sql(con=conn, sql=f"SELECT * FROM stock;")
-        df = df[df['Available_stock'] < 5].set_index('Code').sort_index().to_html()
+        df = df[df['Available_stock'] < 10].set_index('Code').sort_index().to_html()
     except:
         cols = ['Code', 'Item', 'Type', 'Category', 'Available_stock', 'Need_to_order']
         df = pd.DataFrame(columns=cols).set_index('Code').to_html()
@@ -130,18 +137,19 @@ def handle_in(request):
         ppt = float(request.POST.get('Price_per_type'))
         pn = str(request.POST.get('Purchaser_name'))
         bd = dt.date.fromisoformat(str(request.POST.get('Billing_date'))).strftime("%d/%m/%Y")
+        ed = dt.date.fromisoformat(str(request.POST.get('Expiry_date'))).strftime("%d/%m/%Y")
         # rb = str(request.POST.get('Received_by'))
         rb = NAME.capitalize()
         rmk = str(request.POST.get('Remark'))
         new_st = int(av_stck) + qty
         ins_q = f"""
-            INSERT INTO stock_in (entry, Receiving_Date, Code, Item, Type, Quantity, Price_per_type, Purchaser_name, Billing_date, Received_by, Remark)
-            VALUES ({ne}, '{rd}', {code}, '{item}', '{type}', {qty}, {ppt}, '{pn}', '{bd}', '{rb}', '{rmk}');
+            INSERT INTO stock_in (entry, Receiving_Date, Code, Item, Type, Quantity, Price_per_type, Purchaser_name, Billing_date, Expiry_date, Received_by, Remark)
+            VALUES ({ne}, '{rd}', {code}, '{item}', '{type}', {qty}, {ppt}, '{pn}', '{bd}', {ed}, '{rb}', '{rmk}');
         """
         cur.execute(ins_q)
         up_q = f"UPDATE stock SET Available_stock = {new_st} WHERE Code = {code};"
         cur.execute(up_q)
-        if new_st >= 5:
+        if new_st >= 10:
             up_q = f"UPDATE stock SET Need_to_order = '' WHERE Code = {code};"
             cur.execute(up_q)
         conn.commit()
@@ -230,6 +238,34 @@ def inv_out(request):
     return render(request, 'inventory_out.html',  {'tab_data': df, 'ret': ret})
 
 
+def download_data(request):
+    conn = sqlite3.connect('store_inventory.sqlite')
+    cols = conn.execute("SELECT name FROM sqlite_master WHERE type='table';").fetchall()
+    tables = []
+    for col in cols:
+        try:
+            tables.append(col[0])
+        except:
+            pass
+    with BytesIO() as b:
+        with pd.ExcelWriter(b) as writer:
+            for col in tables:
+                if col != 'users':
+                    df = pd.read_sql(con=conn, sql=f"SELECT * FROM '{col}'")
+                    df.to_excel(writer, sheet_name=col, index=False)
+        res = HttpResponse(
+            b.getvalue(), # Gives the Byte string of the Byte Buffer object
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+
+    res['Content-Disposition'] = f'attachment; filename=store_inventory.xlsx'
+
+    conn.close()
+
+    return res
+
+
+
 def index(request):
     global loggedin
     global NAME
@@ -247,6 +283,8 @@ def index(request):
             loggedin = False
             NAME = None
             return redirect(to='/login/')
+        elif "Download_Inv" in request.POST:
+            return download_data(request)
         else:
             return render(request, 'index.html', {'tab_data': tab_data})
     else:
