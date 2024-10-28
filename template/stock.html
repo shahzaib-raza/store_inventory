@@ -60,14 +60,13 @@
     </style>
     <body>
 
-
         <script>
             // Set a timeout of 60 seconds
-            let logoutTimer = setTimeout(triggerLogout, 60000);
+            let logoutTimer = setTimeout(triggerLogout, 120000);
           
             function resetTimer() {
               clearTimeout(logoutTimer);
-              logoutTimer = setTimeout(triggerLogout, 60000);
+              logoutTimer = setTimeout(triggerLogout, 120000);
             }
           
             function triggerLogout() {
