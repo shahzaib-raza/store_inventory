@@ -144,7 +144,7 @@ def handle_in(request):
         new_st = int(av_stck) + qty
         ins_q = f"""
             INSERT INTO stock_in (entry, Receiving_Date, Code, Item, Type, Quantity, Price_per_type, Purchaser_name, Billing_date, Expiry_date, Received_by, Remark)
-            VALUES ({ne}, '{rd}', {code}, '{item}', '{type}', {qty}, {ppt}, '{pn}', '{bd}', {ed}, '{rb}', '{rmk}');
+            VALUES ({ne}, '{rd}', {code}, '{item}', '{type}', {qty}, {ppt}, '{pn}', '{bd}', '{ed}', '{rb}', '{rmk}');
         """
         cur.execute(ins_q)
         up_q = f"UPDATE stock SET Available_stock = {new_st} WHERE Code = {code};"
